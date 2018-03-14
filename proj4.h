@@ -4,7 +4,8 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
-#define KEY 1077
+#define PCBKEY 1077
+#define CLKKEY 1138
 #define MSGSZ 256
 #define NPS 1000000000
 
@@ -38,7 +39,7 @@ void simadd(sim_time *time, int increment) {
 	
 	if (time->nano >= NPS) {
 		time->sec += (time->nano / NPS);
-		time->sec = (time->sec % NPS);
+		time->nano = (time->sec % NPS);
 	}
 }
 

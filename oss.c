@@ -1,40 +1,55 @@
-// OSS.c
+// oss.c
 #include "proj4.h"
 
 int main() {
 	const int maxTimeBetweenNewProcsNS = 0;
 	const int maxTimeBetweenNewProcsSecs = NPS;
-	int shmid;
-	pcb *pcbTable;
-	pid_t pid;
-	int i;
+
+	int pcbShmid;		// Shared memory ID of process control block table
+	int clkShmid;		// Shared memory ID of simclock
+	int msgShmid;		// Message queue ID
+
+	pcb *pcbTable;		// Pointer to table of process control blocks
+	sim_time *ossClock;	// Pointer to simulated system clock
+
+	pid_t pid;	// pid generated after a fork
+	int i = 0;
 
 
-	if ((shmid = shmget(KEY, 18*sizeof(pcbTable), IPC_CREAT | 0666)) < 0 ) {
-		perror("oss: shmid");
+	// Create memory segment for process control table
+	if ((pcbShmid = shmget(PCBKEY, 18*sizeof(pcbTable), IPC_CREAT | 0666)) < 0 ) {
+		perror("oss: pcbShmid");
 		exit(1);
 	}
+	pcbTable = shmat(pcbShmid, NULL, 0);
 
-	pcbTable = shmat(shmid, NULL, 0);
-	shmctl(shmid, IPC_RMID, NULL);
+	// Create memory segment for simulated system clock
+	if ((clkShmid = shmget(CLKKEY, sizeof(sim_time), IPC_CREAT | 0666)) < 0 ) {
+		perror("oss: clkShmid");
+		exit(1);
+	}
+	ossClock = shmat(clkShmid, NULL, 0);
 
-	//pcbTable[1].start.sec = 2;
-	//pcbTable[2] = pcbTable[1];
-	//pcbTable[1].start.sec++;
-	//printf("Block 1 start sec: %d\n", pcbTable[1].start.sec);
-	//printf("Block 2 start sec: %d\n", pcbTable[2].start.sec);
+	// Initialze simulated clock to 0.0
+	ossClock->sec = 0;
+	ossClock->nano = 0;
 
-	for (i = 0; i < 18; i++) {
-		if ((pid = fork()) == 0) {
-			exit(0);
-		}
-		pcbTable[i].pid = pid;
-		pcbTable[i].queue = i;
-		printBlock(i, pcbTable[i]);
+	// Create a process
+	if ((pid = fork()) == 0) {
+		execl("./user", "user", NULL);
+		exit(0);
 	}
 
-	shmdt(pcbTable);	
-	//shmctl(shmid, IPC_RMID, NULL);
+	i = ((long)pid) % 18;
+	pcbTable[i].pid = pid;
+	pcbTable[i].queue = i;
+
+
+	sleep(1);
+
+	// Cleanup IPC
+	shmctl(pcbShmid, IPC_RMID, NULL);
+	shmctl(clkShmid, IPC_RMID, NULL);
 
 	return 0;
 }
