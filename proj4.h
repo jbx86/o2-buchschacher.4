@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <string.h>
 
 #define PCBKEY 1077
 #define CLKKEY 1138
+#define MSGKEY 4242
 #define MSGSZ 256
 #define NPS 1000000000
 
@@ -26,7 +29,7 @@ typedef struct {
 typedef struct msgbuf {
 	long mtype;
 	char mtext[MSGSZ];
-} message_buff;
+} message_buf;
 
 // Add a number of nanoseconds to a sim_time
 void simadd(sim_time *time, int increment) {
@@ -43,6 +46,7 @@ void simadd(sim_time *time, int increment) {
 	}
 }
 
+// Calculate number of time that has passed between two times
 int simdiff(sim_time simclock, sim_time epoch) {
 	if (simclock.sec < epoch.sec) {
 		fprintf(stderr, "simdiff error: first time must be greater than second time");
