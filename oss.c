@@ -5,6 +5,8 @@ int main() {
 	const int maxTimeBetweenNewProcsNS = 0;
 	const int maxTimeBetweenNewProcsSecs = NPS;
 
+	const int rtProb = 100;	// Probability of generating a realtime process
+
 	int pcbid;		// Shared memory ID of process control block table
 	int clockid;		// Shared memory ID of simulated system clock
 	int msgid;		// Message queue ID
@@ -21,7 +23,7 @@ int main() {
 			0, 0, 0, 0, 0, 0};
 
 	pid_t pid;	// pid generated after a fork
-	int queueNum;	// 1 for realitme, 2 for high, 3 for medium, 4 for low, 5 for from process
+	int queueNum;	// 0 for realitme, 1 for high, 2 for medium, 3 for low
 
 	int i = 0;
 	int newUser = 1;
@@ -53,7 +55,7 @@ int main() {
 		exit(1);
 	}
 
-	// Initialize queue with ready message
+/*	// Initialize queue with ready message
 	queueNum = 0;
 	buf.mtype = queueNum + 1;
 	sprintf(buf.mtext, "Message from OSS");
@@ -61,8 +63,14 @@ int main() {
 	if (msgsnd(msgid, &buf, buf_length, 0) < 0) {
 		perror("oss: msgsend");
 	}
+*/
 
-	while (ticks < 10) {
+	// Initialize random generator
+	srand(time(0));
+
+// End Setup
+
+	while (1) {
 
 		// Wait for message
 		if (msgrcv(msgid, &buf, MSGSZ, 0, 0) < 0) {
@@ -71,19 +79,6 @@ int main() {
 		}
 
 // Start critical section
-
-		// Check if it's time spawn a user process
-		if (newUser) {
-			printf("SPAWN!\n");
-			if ((pid = fork()) == 0) {
-				execl("./user", "user", NULL);
-				exit(0);
-			}
-			pcbTable[0].pid = pid;
-			pcbTable[0].queue = 1;
-			while (i++ < 100000000); //give user time to initialize
-			newUser = 0;
-		}
 
 		// Find next process in queue or advance clock
 		if (buf.mtype != 5) {
@@ -103,6 +98,37 @@ int main() {
 			printf("clock: %d.%09d\n", ossClock->sec, ossClock->nano);
 		}
 
+		// Check if it's time spawn a user process
+		if (newUser) {
+			queueNum = 0; // Reset queue to zero when a new process is added
+			int queueRoll;
+			// Randomly assign processes as real-time or normal
+			if ((queueRoll = rand() % 100) < rtProb) {
+				pcbTable[0].queue = 0;
+			}
+			else {
+				pcbTable[0].queue = 1;
+			}
+
+			pcbTable[0].arrival = *ossClock;
+
+			// Fork and execute child process
+			if ((pid = fork()) == 0) {
+				execl("./user", "user", NULL);
+				exit(0);
+			}
+
+			pcbTable[0].pid = pid;
+
+			printBlock(0, pcbTable[0]);	
+
+			while (i++ < 500000000); //give user time to initialize
+			newUser = 0;
+
+		}
+
+
+
 		i++;
 
 // End critical section
@@ -120,11 +146,13 @@ int main() {
 
 // Cleanup IPC
 
-/*
-	for (i = 0; i < 4; i++) {
-		kill(pcbTable[i].pid, SIGINT);
+
+	for (i = 0; i < 18; i++) {
+		if (pcbTable[i].pid != 0) { 
+			kill(pcbTable[i].pid, SIGINT);
+		}
 	}
-*/
+
 	//wait(NULL);
 
 	shmctl(pcbid, IPC_RMID, NULL); // Release process control block memeory

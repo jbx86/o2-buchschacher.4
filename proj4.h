@@ -19,7 +19,7 @@ typedef struct {
 
 typedef struct {
 	pid_t pid;
-	sim_time start;
+	sim_time arrival;
 	sim_time cpuTimeUsed;
 	sim_time runtime;
 	int lastBurst;
@@ -66,5 +66,5 @@ int simdiff(sim_time simclock, sim_time epoch) {
 }
 
 void printBlock(int i, pcb a) {
-	printf("Block %d:\n\tPID: %ld\n\tPriority: %d\n", i, a.pid, a.queue);
+	printf("Block %d:\n\tPID: %ld\n\tPriority: %d\n\tArrival: %d.%09d\n", i, a.pid, a.queue, a.arrival.sec, a.arrival.nano);
 }
