@@ -11,13 +11,12 @@ int main() {
 	message_buf buf;	// Message buffer
 	size_t buf_length;	// Length of send message buffer
 
-	pid_t pid = getpid();	// pid of this child
 	int i;
 
 // Setup IPC
 
 	// Locate shared process control table
-	if ((pcbShmid = shmget(PCBKEY, 18*sizeof(pcbTable), 0666)) < 0 ) {
+	if ((pcbShmid = shmget(PCBKEY, SIZE*sizeof(pcbTable), 0666)) < 0 ) {
 		perror("user: shmget pcbShmid");
 		exit(1);
 	}
@@ -36,46 +35,55 @@ int main() {
 		exit(1);
 	}
 
-	while (1) {
+	// Find this processes simulated PID
+	int myPid = -1;
+	for (i = 0; i < SIZE; i++) {
+		if (pcbTable[i].pid == getpid())
+			break;
+	}
+	if (i != SIZE)
+		myPid = i;		
 
-		// Block until message recieved
-		if (msgrcv(msgShmid, &buf, MSGSZ, pcbTable->queue, 0) < 0) {
+	srand(pcbTable[myPid].seed);
+	
+
+	printf("USER: PID %d is running!\n", myPid);
+
+// Main loop
+
+	while (pcbTable[myPid].termFlag == 0) {
+
+		// Wait on message from OSS
+		printf("%d: Waiting for message\n", myPid);
+		if (msgrcv(msgShmid, &buf, MSGSZ, myPid + 1, 0) < 0) {
 			perror("user: msgrcv");
 			exit(1);
 		}
 
-// Start critical section
-
-		printf("%ld: recived message %d at time %d.%09d\n", pcbTable[0].pid, buf.mtype, ossClock->sec, ossClock->nano);
-		if ((pcbTable->queue > 0) && (pcbTable->queue < 4)) {
-			pcbTable->queue++;
+		if ((rand() % 100) < 0) {
+			printf("%d: Will terminate\n", myPid);
+			pcbTable[myPid].termFlag = 1;
+		}
+		else {
+			printf("%d: Will continue to run\n", myPid);
+			pcbTable[myPid].termFlag = 0;
 		}
 
-// End critical section
+		printf("%d: In critical section\n", myPid);
+		sleep(1);
 
+		printf("%d: Send message to OSS\n", myPid);
+		
 		// send back mtype 5 to tell OSS a process was run at this level
-		buf.mtype = 5;
+		buf.mtype = SIZE + 1;
 		sprintf(buf.mtext, "Message from user");
 		buf_length = strlen(buf.mtext) + 1;
 		if (msgsnd(msgShmid, &buf, buf_length, 0) < 0) {
 			perror("user: msgsend");
 		}
-
 	}
 
-//printf("Message recieved\n");
-/*
-	// Rest of the program:
-	i = 0;
-	while ((pid != pcbTable[i].pid) && (i < 18)) {
-		i++;
-	}
-	if (i < 18) {
-		printBlock(i, pcbTable[i]);
-	}
-*/	
-//
+	printf("%d: Terminating\n", myPid);
 
-
-	return 0;
+	exit(0);
 }

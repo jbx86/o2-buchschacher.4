@@ -11,6 +11,7 @@
 #define MSGKEY 4242
 #define MSGSZ 256
 #define NPS 1000000000
+#define SIZE 18
 
 typedef struct {
 	int sec;
@@ -22,8 +23,12 @@ typedef struct {
 	sim_time arrival;
 	sim_time cpuTimeUsed;
 	sim_time runtime;
-	int lastBurst;
+	int lastburst;
 	int queue;
+	int timeslice;
+	int termFlag;
+	int suspFlag;
+	int seed;
 } pcb;
 
 typedef struct msgbuf {

@@ -1,14 +1,13 @@
 // oss.c
 #include "proj4.h"
 
-#define SIZE 18
-
 int dequeue(int[*]);
 void enqueue(int[*], int);
+sim_time addTime(sim_time, int, int);
 
 int main() {
-	const int maxTimeBetweenNewProcsNS = 0;
-	const int maxTimeBetweenNewProcsSecs = NPS;	
+	const int maxTimeBetweenNewProcsSecs = 1;
+	const int maxTimeBetweenNewProcsNS = NPS;	
 
 	int pcbid;		// Shared memory ID of process control block table
 	int clockid;		// Shared memory ID of simulated system clock
@@ -16,33 +15,40 @@ int main() {
 
 	pcb *pcbTable;		// Pointer to table of process control blocks
 	sim_time *ossClock;	// Pointer to simulated system clock
+
 	message_buf buf;
 	size_t buf_length;
 
-
-	sim_time newxProc;	// Time at which the next process will be generated
+	sim_time nextFork;	// Time at which the next process will be generated
 	
 	int quantum[5] = {10, 20, 40, 80, 100};
 	int inUse[SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
 	int queue[5][SIZE] = {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},		// Realtime queue
 				{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	// High priority queue
 				{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	// Mid priority queue
 				{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	// Low priority queue
 				{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};	// Blocked queue
 
-
-	pid_t pid;	// pid generated after a fork
-	int queueNum;	// 0 for realitme, 1 for high, 2 for medium, 3 for low
+	pid_t pid;	// pid generated after a fork	
 
 	int i = 0;
-	int newUser = 1;
+	//int newUser = 1;
 	int ticks = 0;
+
+	// Open log file for output
+	FILE *fp;
+	fp = fopen("data.log", "w");
+	if (fp == NULL) {
+		fprintf(stderr, "Can't open file\n");
+		exit(1);
+	}
+
+	fprintf(fp, "Activity Log:\n");
 
 // Setup IPC
 
 	// Create memory segment for process control table
-	if ((pcbid = shmget(PCBKEY, 19*sizeof(pcbTable), IPC_CREAT | 0666)) < 0 ) {
+	if ((pcbid = shmget(PCBKEY, SIZE*sizeof(pcbTable), IPC_CREAT | 0666)) < 0 ) {
 		perror("oss: pcbid");
 		exit(1);
 	}
@@ -65,223 +71,160 @@ int main() {
 		exit(1);
 	}
 
-	// Initialize random generator
-	srand(time(0));
+
+	srand(time(0));				// Initialize rand()
+	nextFork = addTime(*ossClock, 1, 0);	// Setup when to generate a process
+
+	int spawnTest = 2;
+	int ossloop = 10;
+	//alarm(3);
+
+	while(ossloop--) {
 
 
-// Fork process
+
+	// Generate new process
+		if (spawnTest--) {
+
+			// Find next open process control block
+			for (i = 0; i < SIZE; i++)
+				if (inUse[i] == 0)
+					break;
 	
-	// Find next open process control block
-	for (i = 0; i < SIZE; i++)
-		if (inUse[i] == 0)
-			break;
+			// If an open process control block is found
+			if (i < SIZE) {
+				// Initialize control block
+				inUse[i] = 1;
+				enqueue(queue[0], i);
+				pcbTable[i].arrival = *ossClock;
+				fprintf(fp, "OSS: Generating process with PID %d and putting it in queue %d at time %d:%09d\n",
+						i, 0, pcbTable[i].arrival.sec, pcbTable[i].arrival.nano) ;
 	
-	printf("inUse[%d] is open\n", i);
-
-
-
-	// If an open process control block is found
-	if (i < SIZE) {
-		inUse[i] = 1;
-		pcbTable[i].pid = pid;
-		pcbTable[i].arrival = *ossClock;
-	
-		if ((pid = fork()) == 0) {
-			printf("child\n");
-			execl("./user", "user", NULL);
-			fprintf(stderr, "Fail to execute child process\n");
+				// fork/execl child
+				if ((pid = fork()) == 0) {
+					execl("./user", "user", NULL);
+					fprintf(stderr, "Fail to execute child process\n");
+				}
+				else {
+					pcbTable[i].pid = pid;
+					pcbTable[i].seed = rand();
+				}
+			}
 		}
-		else {
-			printf("parent\n");
-		}
-	}
 
-/* Testing
-	printf("%d\n", dequeue(queue[0]));
-	enqueue(queue[0], 5);
-	printf("%d\n", dequeue(queue[0]));
-	printf("%d\n", dequeue(queue[0]));
-	printf("%d\n", dequeue(queue[0]));
-*/
+// Scheduler
+
+		// Find next process to run
+		int lvl;
+		int nextPid;
+		for (lvl = 0; lvl < 4; lvl++)
+			if ((nextPid = dequeue(queue[lvl])) != -1)
+				break;
+	
+		// Dispatch next ready process or increment to generation
+		if (nextPid != -1) {
+			fprintf(fp, "OSS: Dispatching process with PID %d from queue %d at time %d:%09d\n",
+				nextPid, lvl, ossClock->sec, ossClock->nano);
 
 
+			// Give nextPid a timeslice
+			pcbTable[nextPid].queue = lvl;
+			pcbTable[nextPid].timeslice = quantum[lvl];
+			printf("OSS: Giving PID %d timeslice of %dns\n", nextPid, pcbTable[nextPid].timeslice);
 
-
-// Allocation test
-/*
-	int nextBlock = allocatePcb(inUse, SIZE, pcbTable, ossClock);
-//	printf("Next open PCB: %d\n", nextBlock);
-
-// End Setup
-	while (1) {
-
-		queueNum = 0;
-		while (queueNum < 5) {
-
-			// Send message to queueNum
-			buf.mtype = queueNum + 1;
+			// Send message to nextPid
+			printf("OSS: Sending message to %d\n", nextPid);
+			pcbTable[nextPid].lastburst = pcbTable[nextPid].timeslice;
+			buf.mtype = nextPid + 1;
 			sprintf(buf.mtext, "Message from OSS");
 			buf_length = strlen(buf.mtext) + 1;
 			if (msgsnd(msgid, &buf, buf_length, 0) < 0) {
 				perror("oss: msgsend");
 			}
-			
-			// Read next message from from buffer
-			if (msgrcv(msgid, &buf, MSGSZ, 0, 0) < 0) {
+
+
+			// Block wait for nextPid to be finished 
+			if (msgrcv(msgid, &buf, MSGSZ, SIZE + 1, 0) < 0) {
 				perror("oss: msgrcv");
 				exit(1);
 			}
+			printf("OSS: PID %d finished, entering critical section\n", nextPid);
+			sleep(1);
 
-			//Determine next queue to read
-			if (buf.mtype == 5) {
-				//increment sim time by time slice
-				break;
+
+			*ossClock = addTime(*ossClock, 0, pcbTable[nextPid].lastburst);		// Advance simclock by time used
+			fprintf(fp, "OSS: total time this dispatch was %d nanoseconds\n", pcbTable[nextPid].lastburst);
+
+			if ((pcbTable[nextPid].queue > 0) && (pcbTable[nextPid].queue < 3))	// Normal class programs down in priority
+				pcbTable[nextPid].queue++;
+
+			// Enqueue nextPid if it has not terminated
+			if (pcbTable[nextPid].termFlag == 0) {
+				enqueue(queue[pcbTable[nextPid].queue], nextPid);
+				fprintf(fp, "OSS: Putting process with PID %d into queue %d\n", nextPid, pcbTable[nextPid].queue);
 			}
-			else {
-				queueNum++;
-			}
-		}
-
-		buf.mtype = queueNum + 1;
-
-		// Wait for message
-		if (msgrcv(msgid, &buf, MSGSZ, 0, 0) < 0) {
-			perror("oss: msgrcv");
-			exit(1);
-		}
-
-// Start critical section
-
-		// Find next process in queue or advance clock
-		if (buf.mtype != 5) {
-			if (queueNum < 3) {
-				queueNum++;
-			}
-			else {
-				queueNum = 0;
-				simadd(ossClock, 100);
-				ticks++;
-				printf("clock: %d.%09d\n", ossClock->sec, ossClock->nano);
-			}
+			fprintf(stderr, "OSS: PID %d ran for %d, completing at %d:%09d\n",
+                                nextPid, pcbTable[nextPid].lastburst, ossClock->sec, ossClock->nano);
 		}
 		else {
-			simadd(ossClock, quantum[queueNum]);
-			ticks++;
-			printf("clock: %d.%09d\n", ossClock->sec, ossClock->nano);
+			*ossClock = addTime(*ossClock, 0, 100);
+			//printf("OSS: no processes in queue, advancing clock to %d.%09d\n", ossClock->sec, ossClock->nano);
 		}
-
-		// Check if it's time spawn a user process
-		if (newUser) {
-			queueNum = 0; // Reset queue to zero when a new process is added
-			int queueRoll;
-			// Randomly assign processes as real-time or normal
-			if ((queueRoll = rand() % 100) < rtProb) {
-				pcbTable[0].queue = 0;
-			}
-			else {
-				pcbTable[0].queue = 1;
-			}
-
-			pcbTable[0].arrival = *ossClock;
-
-			// Fork and execute child process
-			if ((pid = fork()) == 0) {
-				execl("./user", "user", NULL);
-				exit(0);
-			}
-
-			pcbTable[0].pid = pid;
-
-			printBlock(0, pcbTable[0]);	
-
-			while (i++ < 500000000); //give user time to initialize
-			newUser = 0;
-
-		}
-		i++;
-
-// End critical section
-
-		// Send ready message
-		buf.mtype = queueNum + 1;
-		sprintf(buf.mtext, "Message from OSS");
-		buf_length = strlen(buf.mtext) + 1;
-		if (msgsnd(msgid, &buf, buf_length, 0) < 0) {
-			perror("oss: msgsend");
-		}
-
-
 	}
-*/
+
 // Cleanup IPC
 
-
-	for (i = 0; i < 18; i++) {
-		if (pcbTable[i].pid != 0) { 
-			kill(pcbTable[i].pid, SIGINT);
+	for (i = 0; i < SIZE; i++)
+		if (inUse[i] == 1) {
+			//kill(pcbTable[i].pid, SIGINT);
+			//wait(pcbTable[i].pid);
 		}
-	}
 
-	//wait(NULL);
 
 	shmctl(pcbid, IPC_RMID, NULL); // Release process control block memeory
 	shmctl(clockid, IPC_RMID, NULL); // Release simulated system clock memory
 	msgctl(msgid, IPC_RMID, NULL); // Release message queue memory
 
+	fclose(fp);
+
 	return 0;
 }
 
+//----- Other Functions --------------------------------------------------------
+
+sim_time addTime(sim_time inputTime, int sec, int nano) {
+	inputTime.nano += nano;
+	inputTime.sec += sec + (inputTime.nano / NPS);
+	inputTime.nano = inputTime.nano % NPS;
+	return inputTime;
+}
+
 int dequeue(int queue[]) {
-	int nextPid = queue[0];
+	int nextPid = queue[0];	// Copy value from first element in queue
 	int i;
+
+	// Shift each value down one
 	for (i = 0; i < (SIZE - 1); i++) {
 		queue[i] = queue[i + 1];
 	}
-	return nextPid;
+	queue[SIZE - 1] = -1;
+
+	return nextPid;	// Return value that was in first element of queue
 }
 
-void enqueue(int queue[], int locPid) {
+void enqueue(int queue[], int simPid) {
 	int i;
+
+	// Traverse queue until open element is found
 	for (i = 0; i < SIZE; i++) {
 		if (queue[i] == -1) {
-			queue[i] = locPid;
+			// Insert simulate pid at end of queue and return to main
+			queue[i] = simPid;
 			return;
 		}
 	}
+	
+	// Overflow error if no open elements in queue
 	fprintf(stderr, "queue overflow\n");
 	exit(1);
-}
-
-int allocatePcb(int inUse[], int inUseSize, pcb *pcbTable, sim_time *ossClock) {
-	int i;
-	int openBlock = -1;
-	int pid;
-
-	// Find an unused PCB
-	for (i = 0; i < inUseSize; i++) {
-		if (inUse[i] == 0) {
-			
-			// Allocate and initialize process control block
-			inUse[i] = 1;
-			pcbTable[i].arrival = *ossClock;
-			if ((rand() % 100) < 100) {
-				pcbTable[i].queue = 0;
-			}
-			else {
-				pcbTable[i].queue = 1;
-			}
-			printf("Spawn?\n");
-
-			// Fork and execl user process
-			if ((pcbTable[i].pid = fork()) == 0) {
-				printf("spawn!\n");
-				execl("./user", "user", NULL);
-				exit(0);
-			}
-			
-			printBlock(i, pcbTable[i]);
-			break;
-		}
-	}
-	return openBlock;
 }
