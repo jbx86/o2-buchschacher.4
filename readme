@@ -1,1 +1,15 @@
-This will be a read me
+Project 4
+
+oss.c serves as the master process, spawning and scheduling user.c processes and
+tracking them using a table of process control blocks. These processes will be
+queued in a "realtime" round-robin queue or one of three normal class queues
+corresponding to high, middle, and low priority.
+
+The schedular in oss.c will dispatch the next process and give it a time slice,
+the process will then decide to use it's entire time slice and signal the
+schedular to re-queue it, use part of it's time slice and signal the schedular
+that it has terminated, or use part of it's time slice and suspend until a
+simulated interupt event has completed and signal the schedular to suspend it
+until some time in the future.
+
+Log at https://github.com/jbx86/o2-buchschacher.4
