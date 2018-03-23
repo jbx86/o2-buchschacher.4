@@ -8,12 +8,12 @@ corresponding to high, middle, and low priority.
 The schedular in oss.c will dispatch the next process and give it a time slice,
 the process will then decide to use it's entire time slice and signal the
 schedular to re-queue it, use part of it's time slice and signal the schedular
-that it has terminated, or use part of it's time slice and suspend until a
-simulated interupt event has completed and signal the schedular to suspend it
-until some time in the future.
+that it has terminated.
 
-oss.c is currently programmed to run 20 processes. This can be changed with the
-maxUser variable in main(), but for any value 28 or over, it will not be able to
-fork a child. Other students were experiencing the same issue.
+Known issues:
+I was unable to implement suspending active processes before turning in the
+project. oss.c is currently programmed to run 20 processes. This can be changed
+with the maxUser variable in main(), but for any value 28 or over, it will not
+be able to fork a child. Other students were experiencing the same issue.
 
 Log at https://github.com/jbx86/o2-buchschacher.4
