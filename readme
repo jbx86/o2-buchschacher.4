@@ -12,4 +12,8 @@ that it has terminated, or use part of it's time slice and suspend until a
 simulated interupt event has completed and signal the schedular to suspend it
 until some time in the future.
 
+oss.c is currently programmed to run 20 processes. This can be changed with the
+maxUser variable in main(), but for any value 28 or over, it will not be able to
+fork a child. Other students were experiencing the same issue.
+
 Log at https://github.com/jbx86/o2-buchschacher.4

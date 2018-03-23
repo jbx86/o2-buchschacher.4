@@ -10,21 +10,25 @@ int clockid;	// Shared memory ID of simulated system clock
 int msgid;	// Message queue ID
 FILE *fp;	// Log file
 
-void sig_handler(int signo) {
+void handler(int signo) {
 	if (signo == SIGINT) {
 		shmctl(pcbid, IPC_RMID, NULL);		// Release process control block memeory
 		shmctl(clockid, IPC_RMID, NULL);	// Release simulated system clock memory
 		msgctl(msgid, IPC_RMID, NULL);		// Release message queue memory
 		fclose(fp);
 	}
+	printf("OSS: Terminated by signal\n");
 }
 
 int main() {
+	signal(SIGINT, handler);
+	signal(SIGALRM, handler);
+
 	const int maxTimeBetweenNewProcsSecs = 1;
 	const int maxTimeBetweenNewProcsNS = NPS - 1;
 	const int dispatchMin = 100;
 	const int dispatchMax = 10000;
-	const int usersMax = 100;
+	const int usersMax = 20;
 	const sim_time zeroClock = {0, 0};
 
 	pcb *pcbTable;		// Pointer to table of process control blocks
@@ -80,19 +84,17 @@ int main() {
 	srand(time(0));				// Initialize rand()
 	nextFork = addTime(*ossClock, 1, 0);	// Setup when to generate a process
 
-//	int spawnTest = 3;
-	int ossloop = 100;
 
-
+	int ossloop = 0;
 	int usersForked = 0;
 	int usersComplete = 0;
 
-	//alarm(3);
+	alarm(3);
 
 // Main loop
 
-	while(ossloop--) {
-	printf("%d\n", ossloop);
+	while(usersComplete < usersMax) {
+	fprintf(fp, "%d\n", usersComplete);
 
 	// Generate new process
 		if ((isPast(*ossClock, nextFork) == 1) && (usersForked < usersMax)) {
@@ -139,7 +141,7 @@ int main() {
 					pcbTable[i].seed = rand();
 				}
 			}
-			nextFork = addTime(*ossClock, 1, 0);
+			nextFork = addTime(*ossClock, 0, 100);
 		}
 
 	// Scheduler
@@ -164,8 +166,9 @@ int main() {
 
 
 			// Give nextPid a timeslice
-			pcbTable[nextPid].timeslice = quantum[pcbTable[nextPid].queue];
-			printf("OSS: Giving PID %d timeslice of %d nanoseconds\n", pcbTable[nextPid].simpid, pcbTable[nextPid].timeslice);
+			pcbTable[nextPid].queue = lvl;
+			pcbTable[nextPid].timeslice = quantum[lvl];
+			fprintf(fp, "OSS: Giving PID %d timeslice of %d nanoseconds\n", pcbTable[nextPid].simpid, pcbTable[nextPid].timeslice);
 
 			// Send message to nextPid
 			printf("OSS: Sending message to %d\n", pcbTable[nextPid].simpid);
@@ -217,6 +220,7 @@ int main() {
 	}
 
 // Cleanup IPC
+	printf("System finished after %d processes ran to completion\n", usersComplete);
 
 	for (i = 0; i < SIZE; i++)
 		if (inUse[i] == 1) {
