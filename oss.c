@@ -5,16 +5,27 @@ int dequeue(int[*]);
 void enqueue(int[*], int);
 sim_time addTime(sim_time, int, int);
 
+int pcbid;	// Shared memory ID of process control block table
+int clockid;	// Shared memory ID of simulated system clock
+int msgid;	// Message queue ID
+FILE *fp;	// Log file
+
+void sig_handler(int signo) {
+	if (signo == SIGINT) {
+		shmctl(pcbid, IPC_RMID, NULL);		// Release process control block memeory
+		shmctl(clockid, IPC_RMID, NULL);	// Release simulated system clock memory
+		msgctl(msgid, IPC_RMID, NULL);		// Release message queue memory
+		fclose(fp);
+	}
+}
+
 int main() {
 	const int maxTimeBetweenNewProcsSecs = 1;
 	const int maxTimeBetweenNewProcsNS = NPS - 1;
 	const int dispatchMin = 100;
 	const int dispatchMax = 10000;
+	const int usersMax = 100;
 	const sim_time zeroClock = {0, 0};
-
-	int pcbid;		// Shared memory ID of process control block table
-	int clockid;		// Shared memory ID of simulated system clock
-	int msgid;		// Message queue ID
 
 	pcb *pcbTable;		// Pointer to table of process control blocks
 	sim_time *ossClock;	// Pointer to simulated system clock
@@ -32,14 +43,10 @@ int main() {
 				{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},	// Low priority queue
 				{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};	// Blocked queue
 
-	pid_t pid;	// pid generated after a fork	
-
-	int i = 0;
-	//int newUser = 1;
-	int ticks = 0;
+	pid_t pid;	// pid generated after a fork
+	int i;
 
 	// Open log file for output
-	FILE *fp;
 	fp = fopen("data.log", "w");
 	if (fp == NULL) {
 		fprintf(stderr, "Can't open file\n");
@@ -73,45 +80,32 @@ int main() {
 	srand(time(0));				// Initialize rand()
 	nextFork = addTime(*ossClock, 1, 0);	// Setup when to generate a process
 
-	int spawnTest = 3;
-	int ossloop = 10;
+//	int spawnTest = 3;
+	int ossloop = 100;
 
 
-/*	sim_time t1 = {3,0};
-	sim_time t2 = {5,3};
-	printf("%d\n", isPast(t1, t2));
-	ossloop = 0;
-*/
-
-	//nextFork = addTime(*ossClock, rand() % (maxTimeBetweenNewProcsSecs + 1), rand() % (maxTimeBetweenNewProcsNS + 1));
-
-	//printf("Clock: %d.%d\nnextFork: %d.%d\n", ossClock->sec, ossClock->nano, nextFork.sec, nextFork.nano);
+	int usersForked = 0;
+	int usersComplete = 0;
 
 	//alarm(3);
 
 // Main loop
 
-	ossloop = 10;
-
-	while(ossloop-- > 0) {
-		//fprintf(fp, "Beggining loop\n");
-		//fprintf(fp, "\tClock:\t\t%d.%09d\n\tNext fork:\t%d.%09d\n", ossClock->sec, ossClock->nano, nextFork.sec, nextFork.nano);
+	while(ossloop--) {
+	printf("%d\n", ossloop);
 
 	// Generate new process
-		if (isPast(*ossClock, nextFork) == 1) {
+		if ((isPast(*ossClock, nextFork) == 1) && (usersForked < usersMax)) {
 			
-			//fprintf(fp, "Dispatching process (Clock: %d.%09d > Next fork:%d.%09d)\n", ossClock->sec, ossClock->nano, nextFork.sec, nextFork.nano);
-			//nextFork = addTime(*ossClock, rand() % (maxTimeBetweenNewProcsSecs + 1), rand() % (maxTimeBetweenNewProcsNS + 1));
-			//fprintf(fp, "\tClock: %d.%09d\n\tNext fork: %d.%09d\n", ossClock->sec, ossClock->nano, nextFork.sec, nextFork.nano);
-
-			//printf("\nSpawn Test: %d\n\n", spawnTest);
-			// Find next open process control block
+			// Find next open process control block i
 			for (i = 0; i < SIZE; i++)
 				if (inUse[i] == 0)
 					break;
 	
 			// If an open process control block is found
 			if (i < SIZE) {
+
+				usersForked++;
 
 				// Initialize control block
 				inUse[i] = 1;
@@ -123,6 +117,7 @@ int main() {
 				pcbTable[i].termFlag = 0;
 				pcbTable[i].suspFlag = 0;
 				pcbTable[i].seed = rand();
+				pcbTable[i].simpid = usersForked;
 
 				// Assign 30% of processes generated to real-time class
 				if (pctToBit(rand(), 30))
@@ -132,7 +127,7 @@ int main() {
 				enqueue(queue[pcbTable[i].queue], i);
 
 				fprintf(fp, "OSS: Generating process with PID %d and putting it in queue %d at time %d:%09d\n",
-						i, pcbTable[i].queue, pcbTable[i].arrival.sec, pcbTable[i].arrival.nano) ;
+						pcbTable[i].simpid, pcbTable[i].queue, pcbTable[i].arrival.sec, pcbTable[i].arrival.nano) ;
 	
 				// fork/execl child
 				if ((pid = fork()) == 0) {
@@ -162,18 +157,18 @@ int main() {
 
 			// Increment clock for amount of work done by this dispatch
 			int dispatchNano = (rand() % (dispatchMax - dispatchMin + 1)) + dispatchMin;
-						*ossClock = addTime(*ossClock, 0, dispatchNano);
+			*ossClock = addTime(*ossClock, 0, dispatchNano);
 
 			fprintf(fp, "OSS: Dispatching process with PID %d from queue %d at time %d:%09d,\nOSS: total time spent in this dispatch was %d nanoseconds\n",
-					nextPid, lvl, ossClock->sec, ossClock->nano, dispatchNano);
+					pcbTable[nextPid].simpid, lvl, ossClock->sec, ossClock->nano, dispatchNano);
 
 
 			// Give nextPid a timeslice
 			pcbTable[nextPid].timeslice = quantum[pcbTable[nextPid].queue];
-			printf("OSS: Giving PID %d timeslice of %d nanoseconds\n", nextPid, pcbTable[nextPid].timeslice);
+			printf("OSS: Giving PID %d timeslice of %d nanoseconds\n", pcbTable[nextPid].simpid, pcbTable[nextPid].timeslice);
 
 			// Send message to nextPid
-			printf("OSS: Sending message to %d\n", nextPid);
+			printf("OSS: Sending message to %d\n", pcbTable[nextPid].simpid);
 			buf.mtype = nextPid + 1;
 			sprintf(buf.mtext, "Message from OSS");
 			buf_length = strlen(buf.mtext) + 1;
@@ -198,15 +193,16 @@ int main() {
 				if ((pcbTable[nextPid].queue > 0) && (pcbTable[nextPid].queue < 3))
 					pcbTable[nextPid].queue++;
 				enqueue(queue[pcbTable[nextPid].queue], nextPid);
-				fprintf(fp, "OSS: Receiving that process with PID %d ran for %d nanoseconds\n", nextPid, pcbTable[nextPid].lastburst);
-				fprintf(fp, "OSS: Putting process with PID %d into queue %d\n", nextPid, pcbTable[nextPid].queue);
+				fprintf(fp, "OSS: Receiving that process with PID %d ran for %d nanoseconds\n", pcbTable[nextPid].simpid, pcbTable[nextPid].lastburst);
+				fprintf(fp, "OSS: Putting process with PID %d into queue %d\n", pcbTable[nextPid].simpid, pcbTable[nextPid].queue);
 
 			}
 			else {
 
 				// Mark block as open
 				inUse[nextPid] = 0;
-				fprintf(fp, "OSS: Receiving that process with PID %d ran for %d nanoseconds,\n", nextPid, pcbTable[nextPid].lastburst);
+				usersComplete++;
+				fprintf(fp, "OSS: Receiving that process with PID %d ran for %d nanoseconds,\n", pcbTable[nextPid].simpid, pcbTable[nextPid].lastburst);
 				fprintf(fp, "OSS: not using all of it's time quantum\n");
 
 			}

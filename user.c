@@ -47,14 +47,14 @@ int main() {
 	srand(pcbTable[myPid].seed);
 	
 
-	printf("USER: PID %d is running!\n", myPid);
+	printf("USER: PID %d (block %d) is running!\n", pcbTable[myPid].simpid,  myPid);
 
 // Main loop
 
 	while (pcbTable[myPid].termFlag == 0) {
 
 		// Wait on message from OSS
-		printf("%d: Waiting for message\n", myPid);
+		printf("%d: Waiting for message\n", pcbTable[myPid].simpid);
 		if (msgrcv(msgShmid, &buf, MSGSZ, myPid + 1, 0) < 0) {
 			perror("user: msgrcv");
 			exit(1);
@@ -62,21 +62,13 @@ int main() {
 
 		// Determine if user will terminate this timeslice
 		if (pctToBit(rand(), 50)) {
-			//printf("%d: Will terminate\n", myPid);
 			pcbTable[myPid].termFlag = 1;
 			pcbTable[myPid].lastburst = rand() % pcbTable[myPid].timeslice;	//Use a random amount of the timeslice
 		}
 		else {
-			//printf("%d: Will continue to run\n", myPid);
 			pcbTable[myPid].termFlag = 0;
 			pcbTable[myPid].lastburst = pcbTable[myPid].timeslice;		//Use all of the timeslice
 		}
-
-/*
-		printf("%d: In critical section\n", myPid);
-		sleep(1);
-		printf("%d: Send message to OSS\n", myPid);
-*/
 		
 		// send back mtype 5 to tell OSS a process was run at this level
 		buf.mtype = SIZE + 1;
@@ -84,10 +76,11 @@ int main() {
 		buf_length = strlen(buf.mtext) + 1;
 		if (msgsnd(msgShmid, &buf, buf_length, 0) < 0) {
 			perror("user: msgsend");
+			exit(1);
 		}
 	}
 
-	printf("%d: Terminating\n", myPid);
+	printf("USER: PID %d (block %d) is terminating\n", pcbTable[myPid].simpid, myPid);
 
 	exit(0);
 }

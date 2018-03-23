@@ -1,34 +1,212 @@
 OSS: No processes in queue
-OSS: Generating process with PID 0 and putting it in queue 1 at time 1:000000000
-OSS: Dispatching process with PID 0 from queue 1 at time 1:000008125,
-OSS: total time spent in this dispatch was 8125 nanoseconds
-OSS: Receiving that process with PID 0 ran for 20 nanoseconds
-OSS: Putting process with PID 0 into queue 2
-OSS: Dispatching process with PID 0 from queue 2 at time 1:000012604,
-OSS: total time spent in this dispatch was 4459 nanoseconds
-OSS: Receiving that process with PID 0 ran for 23 nanoseconds,
+OSS: Generating process with PID 1 and putting it in queue 1 at time 1:000000000
+OSS: Dispatching process with PID 1 from queue 1 at time 1:000002513,
+OSS: total time spent in this dispatch was 2513 nanoseconds
+OSS: Receiving that process with PID 1 ran for 13 nanoseconds,
 OSS: not using all of it's time quantum
 OSS: No processes in queue
-OSS: Generating process with PID 0 and putting it in queue 1 at time 2:000000000
-OSS: Dispatching process with PID 0 from queue 1 at time 2:000000723,
-OSS: total time spent in this dispatch was 723 nanoseconds
-OSS: Receiving that process with PID 0 ran for 20 nanoseconds
-OSS: Putting process with PID 0 into queue 2
-OSS: Dispatching process with PID 0 from queue 2 at time 2:000002608,
-OSS: total time spent in this dispatch was 1865 nanoseconds
-OSS: Receiving that process with PID 0 ran for 40 nanoseconds
-OSS: Putting process with PID 0 into queue 3
-OSS: Dispatching process with PID 0 from queue 3 at time 2:000009861,
-OSS: total time spent in this dispatch was 7213 nanoseconds
-OSS: Receiving that process with PID 0 ran for 70 nanoseconds,
+OSS: Generating process with PID 2 and putting it in queue 1 at time 2:000000000
+OSS: Dispatching process with PID 2 from queue 1 at time 2:000002683,
+OSS: total time spent in this dispatch was 2683 nanoseconds
+OSS: Receiving that process with PID 2 ran for 20 nanoseconds
+OSS: Putting process with PID 2 into queue 2
+OSS: Dispatching process with PID 2 from queue 2 at time 2:000010254,
+OSS: total time spent in this dispatch was 7551 nanoseconds
+OSS: Receiving that process with PID 2 ran for 40 nanoseconds
+OSS: Putting process with PID 2 into queue 3
+OSS: Dispatching process with PID 2 from queue 3 at time 2:000017898,
+OSS: total time spent in this dispatch was 7604 nanoseconds
+OSS: Receiving that process with PID 2 ran for 80 nanoseconds
+OSS: Putting process with PID 2 into queue 3
+OSS: Dispatching process with PID 2 from queue 3 at time 2:000024613,
+OSS: total time spent in this dispatch was 6635 nanoseconds
+OSS: Receiving that process with PID 2 ran for 80 nanoseconds
+OSS: Putting process with PID 2 into queue 3
+OSS: Dispatching process with PID 2 from queue 3 at time 2:000029898,
+OSS: total time spent in this dispatch was 5205 nanoseconds
+OSS: Receiving that process with PID 2 ran for 80 nanoseconds
+OSS: Putting process with PID 2 into queue 3
+OSS: Dispatching process with PID 2 from queue 3 at time 2:000035852,
+OSS: total time spent in this dispatch was 5874 nanoseconds
+OSS: Receiving that process with PID 2 ran for 70 nanoseconds,
 OSS: not using all of it's time quantum
 OSS: No processes in queue
-OSS: Generating process with PID 0 and putting it in queue 0 at time 3:000000000
-OSS: Dispatching process with PID 0 from queue 0 at time 3:000008919,
-OSS: total time spent in this dispatch was 8919 nanoseconds
-OSS: Receiving that process with PID 0 ran for 10 nanoseconds
-OSS: Putting process with PID 0 into queue 0
-OSS: Dispatching process with PID 0 from queue 0 at time 3:000009262,
-OSS: total time spent in this dispatch was 333 nanoseconds
-OSS: Receiving that process with PID 0 ran for 10 nanoseconds
-OSS: Putting process with PID 0 into queue 0
+OSS: Generating process with PID 3 and putting it in queue 1 at time 3:000000000
+OSS: Dispatching process with PID 3 from queue 1 at time 3:000004404,
+OSS: total time spent in this dispatch was 4404 nanoseconds
+OSS: Receiving that process with PID 3 ran for 16 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 4 and putting it in queue 1 at time 4:000000000
+OSS: Dispatching process with PID 4 from queue 1 at time 4:000004923,
+OSS: total time spent in this dispatch was 4923 nanoseconds
+OSS: Receiving that process with PID 4 ran for 20 nanoseconds
+OSS: Putting process with PID 4 into queue 2
+OSS: Dispatching process with PID 4 from queue 2 at time 4:000010927,
+OSS: total time spent in this dispatch was 5984 nanoseconds
+OSS: Receiving that process with PID 4 ran for 5 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 5 and putting it in queue 1 at time 5:000000000
+OSS: Dispatching process with PID 5 from queue 1 at time 5:000002579,
+OSS: total time spent in this dispatch was 2579 nanoseconds
+OSS: Receiving that process with PID 5 ran for 1 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 6 and putting it in queue 1 at time 6:000000000
+OSS: Dispatching process with PID 6 from queue 1 at time 6:000005067,
+OSS: total time spent in this dispatch was 5067 nanoseconds
+OSS: Receiving that process with PID 6 ran for 1 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 7 and putting it in queue 1 at time 7:000000000
+OSS: Dispatching process with PID 7 from queue 1 at time 7:000000694,
+OSS: total time spent in this dispatch was 694 nanoseconds
+OSS: Receiving that process with PID 7 ran for 5 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 8 and putting it in queue 1 at time 8:000000000
+OSS: Dispatching process with PID 8 from queue 1 at time 8:000002753,
+OSS: total time spent in this dispatch was 2753 nanoseconds
+OSS: Receiving that process with PID 8 ran for 9 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 9 and putting it in queue 0 at time 9:000000000
+OSS: Dispatching process with PID 9 from queue 0 at time 9:000003788,
+OSS: total time spent in this dispatch was 3788 nanoseconds
+OSS: Receiving that process with PID 9 ran for 2 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 10 and putting it in queue 1 at time 10:000000000
+OSS: Dispatching process with PID 10 from queue 1 at time 10:000006776,
+OSS: total time spent in this dispatch was 6776 nanoseconds
+OSS: Receiving that process with PID 10 ran for 14 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 11 and putting it in queue 1 at time 11:000000000
+OSS: Dispatching process with PID 11 from queue 1 at time 11:000003892,
+OSS: total time spent in this dispatch was 3892 nanoseconds
+OSS: Receiving that process with PID 11 ran for 20 nanoseconds
+OSS: Putting process with PID 11 into queue 2
+OSS: Dispatching process with PID 11 from queue 2 at time 11:000009944,
+OSS: total time spent in this dispatch was 6032 nanoseconds
+OSS: Receiving that process with PID 11 ran for 40 nanoseconds
+OSS: Putting process with PID 11 into queue 3
+OSS: Dispatching process with PID 11 from queue 3 at time 11:000012200,
+OSS: total time spent in this dispatch was 2216 nanoseconds
+OSS: Receiving that process with PID 11 ran for 80 nanoseconds
+OSS: Putting process with PID 11 into queue 3
+OSS: Dispatching process with PID 11 from queue 3 at time 11:000022057,
+OSS: total time spent in this dispatch was 9777 nanoseconds
+OSS: Receiving that process with PID 11 ran for 80 nanoseconds
+OSS: Putting process with PID 11 into queue 3
+OSS: Dispatching process with PID 11 from queue 3 at time 11:000030806,
+OSS: total time spent in this dispatch was 8669 nanoseconds
+OSS: Receiving that process with PID 11 ran for 6 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 12 and putting it in queue 0 at time 12:000000000
+OSS: Dispatching process with PID 12 from queue 0 at time 12:000006244,
+OSS: total time spent in this dispatch was 6244 nanoseconds
+OSS: Receiving that process with PID 12 ran for 0 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 13 and putting it in queue 1 at time 13:000000000
+OSS: Dispatching process with PID 13 from queue 1 at time 13:000006728,
+OSS: total time spent in this dispatch was 6728 nanoseconds
+OSS: Receiving that process with PID 13 ran for 20 nanoseconds
+OSS: Putting process with PID 13 into queue 2
+OSS: Dispatching process with PID 13 from queue 2 at time 13:000010082,
+OSS: total time spent in this dispatch was 3334 nanoseconds
+OSS: Receiving that process with PID 13 ran for 40 nanoseconds
+OSS: Putting process with PID 13 into queue 3
+OSS: Dispatching process with PID 13 from queue 3 at time 13:000015015,
+OSS: total time spent in this dispatch was 4893 nanoseconds
+OSS: Receiving that process with PID 13 ran for 79 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 14 and putting it in queue 1 at time 14:000000000
+OSS: Dispatching process with PID 14 from queue 1 at time 14:000009195,
+OSS: total time spent in this dispatch was 9195 nanoseconds
+OSS: Receiving that process with PID 14 ran for 20 nanoseconds
+OSS: Putting process with PID 14 into queue 2
+OSS: Dispatching process with PID 14 from queue 2 at time 14:000014168,
+OSS: total time spent in this dispatch was 4953 nanoseconds
+OSS: Receiving that process with PID 14 ran for 40 nanoseconds
+OSS: Putting process with PID 14 into queue 3
+OSS: Dispatching process with PID 14 from queue 3 at time 14:000020725,
+OSS: total time spent in this dispatch was 6517 nanoseconds
+OSS: Receiving that process with PID 14 ran for 80 nanoseconds
+OSS: Putting process with PID 14 into queue 3
+OSS: Dispatching process with PID 14 from queue 3 at time 14:000025774,
+OSS: total time spent in this dispatch was 4969 nanoseconds
+OSS: Receiving that process with PID 14 ran for 61 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 15 and putting it in queue 1 at time 15:000000000
+OSS: Dispatching process with PID 15 from queue 1 at time 15:000008634,
+OSS: total time spent in this dispatch was 8634 nanoseconds
+OSS: Receiving that process with PID 15 ran for 0 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 16 and putting it in queue 0 at time 16:000000000
+OSS: Dispatching process with PID 16 from queue 0 at time 16:000004114,
+OSS: total time spent in this dispatch was 4114 nanoseconds
+OSS: Receiving that process with PID 16 ran for 7 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 17 and putting it in queue 1 at time 17:000000000
+OSS: Dispatching process with PID 17 from queue 1 at time 17:000009328,
+OSS: total time spent in this dispatch was 9328 nanoseconds
+OSS: Receiving that process with PID 17 ran for 10 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 18 and putting it in queue 1 at time 18:000000000
+OSS: Dispatching process with PID 18 from queue 1 at time 18:000001093,
+OSS: total time spent in this dispatch was 1093 nanoseconds
+OSS: Receiving that process with PID 18 ran for 13 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 19 and putting it in queue 1 at time 19:000000000
+OSS: Dispatching process with PID 19 from queue 1 at time 19:000005080,
+OSS: total time spent in this dispatch was 5080 nanoseconds
+OSS: Receiving that process with PID 19 ran for 20 nanoseconds
+OSS: Putting process with PID 19 into queue 2
+OSS: Dispatching process with PID 19 from queue 2 at time 19:000012447,
+OSS: total time spent in this dispatch was 7347 nanoseconds
+OSS: Receiving that process with PID 19 ran for 1 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 20 and putting it in queue 1 at time 20:000000000
+OSS: Dispatching process with PID 20 from queue 1 at time 20:000006864,
+OSS: total time spent in this dispatch was 6864 nanoseconds
+OSS: Receiving that process with PID 20 ran for 7 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 21 and putting it in queue 1 at time 21:000000000
+OSS: Dispatching process with PID 21 from queue 1 at time 21:000005468,
+OSS: total time spent in this dispatch was 5468 nanoseconds
+OSS: Receiving that process with PID 21 ran for 9 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 22 and putting it in queue 0 at time 22:000000000
+OSS: Dispatching process with PID 22 from queue 0 at time 22:000005619,
+OSS: total time spent in this dispatch was 5619 nanoseconds
+OSS: Receiving that process with PID 22 ran for 10 nanoseconds
+OSS: Putting process with PID 22 into queue 0
+OSS: Dispatching process with PID 22 from queue 0 at time 22:000013446,
+OSS: total time spent in this dispatch was 7817 nanoseconds
+OSS: Receiving that process with PID 22 ran for 10 nanoseconds
+OSS: Putting process with PID 22 into queue 0
+OSS: Dispatching process with PID 22 from queue 0 at time 22:000016414,
+OSS: total time spent in this dispatch was 2958 nanoseconds
+OSS: Receiving that process with PID 22 ran for 6 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 23 and putting it in queue 1 at time 23:000000000
+OSS: Dispatching process with PID 23 from queue 1 at time 23:000000212,
+OSS: total time spent in this dispatch was 212 nanoseconds
+OSS: Receiving that process with PID 23 ran for 11 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 24 and putting it

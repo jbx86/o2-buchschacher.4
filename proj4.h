@@ -29,6 +29,7 @@ typedef struct {
 	int termFlag;
 	int suspFlag;
 	int seed;
+	int simpid;
 } pcb;
 
 typedef struct msgbuf {
