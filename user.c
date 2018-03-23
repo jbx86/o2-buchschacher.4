@@ -60,19 +60,23 @@ int main() {
 			exit(1);
 		}
 
-		if ((rand() % 100) < 0) {
-			printf("%d: Will terminate\n", myPid);
+		// Determine if user will terminate this timeslice
+		if (pctToBit(rand(), 50)) {
+			//printf("%d: Will terminate\n", myPid);
 			pcbTable[myPid].termFlag = 1;
+			pcbTable[myPid].lastburst = rand() % pcbTable[myPid].timeslice;	//Use a random amount of the timeslice
 		}
 		else {
-			printf("%d: Will continue to run\n", myPid);
+			//printf("%d: Will continue to run\n", myPid);
 			pcbTable[myPid].termFlag = 0;
+			pcbTable[myPid].lastburst = pcbTable[myPid].timeslice;		//Use all of the timeslice
 		}
 
+/*
 		printf("%d: In critical section\n", myPid);
 		sleep(1);
-
 		printf("%d: Send message to OSS\n", myPid);
+*/
 		
 		// send back mtype 5 to tell OSS a process was run at this level
 		buf.mtype = SIZE + 1;

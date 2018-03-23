@@ -1,40 +1,34 @@
-Activity Log:
-OSS: Generating process with PID 0 and putting it in queue 0 at time 0:000000000
-OSS: Dispatching process with PID 0 from queue 0 at time 0:000000000
-OSS: total time this dispatch was 10 nanoseconds
+OSS: No processes in queue
+OSS: Generating process with PID 0 and putting it in queue 1 at time 1:000000000
+OSS: Dispatching process with PID 0 from queue 1 at time 1:000008125,
+OSS: total time spent in this dispatch was 8125 nanoseconds
+OSS: Receiving that process with PID 0 ran for 20 nanoseconds
+OSS: Putting process with PID 0 into queue 2
+OSS: Dispatching process with PID 0 from queue 2 at time 1:000012604,
+OSS: total time spent in this dispatch was 4459 nanoseconds
+OSS: Receiving that process with PID 0 ran for 23 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 0 and putting it in queue 1 at time 2:000000000
+OSS: Dispatching process with PID 0 from queue 1 at time 2:000000723,
+OSS: total time spent in this dispatch was 723 nanoseconds
+OSS: Receiving that process with PID 0 ran for 20 nanoseconds
+OSS: Putting process with PID 0 into queue 2
+OSS: Dispatching process with PID 0 from queue 2 at time 2:000002608,
+OSS: total time spent in this dispatch was 1865 nanoseconds
+OSS: Receiving that process with PID 0 ran for 40 nanoseconds
+OSS: Putting process with PID 0 into queue 3
+OSS: Dispatching process with PID 0 from queue 3 at time 2:000009861,
+OSS: total time spent in this dispatch was 7213 nanoseconds
+OSS: Receiving that process with PID 0 ran for 70 nanoseconds,
+OSS: not using all of it's time quantum
+OSS: No processes in queue
+OSS: Generating process with PID 0 and putting it in queue 0 at time 3:000000000
+OSS: Dispatching process with PID 0 from queue 0 at time 3:000008919,
+OSS: total time spent in this dispatch was 8919 nanoseconds
+OSS: Receiving that process with PID 0 ran for 10 nanoseconds
 OSS: Putting process with PID 0 into queue 0
-OSS: Generating process with PID 1 and putting it in queue 0 at time 0:000000010
-OSS: Dispatching process with PID 0 from queue 0 at time 0:000000010
-OSS: total time this dispatch was 10 nanoseconds
+OSS: Dispatching process with PID 0 from queue 0 at time 3:000009262,
+OSS: total time spent in this dispatch was 333 nanoseconds
+OSS: Receiving that process with PID 0 ran for 10 nanoseconds
 OSS: Putting process with PID 0 into queue 0
-OSS: Dispatching process with PID 1 from queue 0 at time 0:000000020
-OSS: total time this dispatch was 10 nanoseconds
-OSS: Putting process with PID 1 into queue 0
-OSS: Generating process with PID 2 and putting it in queue 0 at time 0:000000030
-OSS: Dispatching process with PID 0 from queue 0 at time 0:000000030
-OSS: total time this dispatch was 10 nanoseconds
-OSS: Putting process with PID 0 into queue 0
-OSS: Generating process with PID 3 and putting it in queue 0 at time 0:000000040
-OSS: Dispatching process with PID 1 from queue 0 at time 0:000000040
-OSS: total time this dispatch was 10 nanoseconds
-OSS: Putting process with PID 1 into queue 0
-OSS: Generating process with PID 4 and putting it in queue 0 at time 0:000000050
-OSS: Dispatching process with PID 2 from queue 0 at time 0:000000050
-OSS: total time this dispatch was 10 nanoseconds
-OSS: Putting process with PID 2 into queue 0
-OSS: Generating process with PID 5 and putting it in queue 0 at time 0:000000060
-OSS: Dispatching process with PID 0 from queue 0 at time 0:000000060
-OSS: total time this dispatch was 10 nanoseconds
-OSS: Putting process with PID 0 into queue 0
-OSS: Generating process with PID 6 and putting it in queue 0 at time 0:000000070
-OSS: Dispatching process with PID 3 from queue 0 at time 0:000000070
-OSS: total time this dispatch was 10 nanoseconds
-OSS: Putting process with PID 3 into queue 0
-OSS: Generating process with PID 7 and putting it in queue 0 at time 0:000000080
-OSS: Dispatching process with PID 1 from queue 0 at time 0:000000080
-OSS: total time this dispatch was 10 nanoseconds
-OSS: Putting process with PID 1 into queue 0
-OSS: Generating process with PID 8 and putting it in queue 0 at time 0:000000090
-OSS: Dispatching process with PID 4 from queue 0 at time 0:000000090
-OSS: total time this dispatch was 10 nanoseconds
-OSS: Putting process with PID 4 into queue 0

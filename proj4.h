@@ -70,6 +70,13 @@ int simdiff(sim_time simclock, sim_time epoch) {
 	return simclock.nano - epoch.nano;
 }
 
+// Input random number and percentage, return 1 percentage% of the time 
+int pctToBit(int roll, int percent) {
+	if ((roll % 100) < percent)
+		return 1;
+	return 0;
+}
+
 void printBlock(int i, pcb a) {
 	printf("Block %d:\n\tPID: %ld\n\tPriority: %d\n\tArrival: %d.%09d\n", i, a.pid, a.queue, a.arrival.sec, a.arrival.nano);
 }
